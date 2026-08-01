@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ワイモス オフセット逆算機 V1.3</title>
+    <title>ワイモス オフセット逆算機 V1.0</title>
     <style>
         body { font-family: sans-serif; margin: 20px; background: #f0f2f5; }
         .calc-box { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -18,15 +18,15 @@
         .btn-reset { flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; }
         .btn-reset:hover { background: #5a6268; }
         .result-box { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; border-left: 5px solid #28a745; }
-        .result-sub { font-size: 12px; color: #666; margin: 4px 0; }
-        .result-val { font-size: 26px; font-weight: bold; color: #dc3545; margin: 5px 0; }
+        .result-sub { font-size: 13px; color: #555; margin: 6px 0; font-family: monospace; }
+        .result-val { font-size: 26px; font-weight: bold; color: #dc3545; margin: 8px 0; font-family: monospace; }
         .note { font-size: 12px; color: #666; margin-top: 15px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="calc-box">
-    <h3>ワイモス オフセット逆算機 <small style="font-size:14px; color:#666;">V1.3</small></h3>
+    <h3>ワイモス オフセット逆算機 <small style="font-size:14px; color:#666;">V1.0</small></h3>
     
     <div class="form-group">
         <label>① 狙いたい隆起量 (mm)</label>
@@ -50,9 +50,13 @@
     
     <div class="result-box">
         <div>設定すべき新しいオフセット値:</div>
-        <div class="result-sub" id="offsetMinus3">-0.3mm にする場合: -- mm</div>
+        <div class="result-sub" id="offsetMinus3">--</div>
+        <div class="result-sub" id="offsetMinus2">--</div>
+        <div class="result-sub" id="offsetMinus1">--</div>
         <div class="result-val" id="newOffset">0.0 mm</div>
-        <div class="result-sub" id="offsetPlus3">+0.3mm にする場合: -- mm</div>
+        <div class="result-sub" id="offsetPlus1">--</div>
+        <div class="result-sub" id="offsetPlus2">--</div>
+        <div class="result-sub" id="offsetPlus3">--</div>
     </div>
 
     <div class="note">
@@ -62,7 +66,7 @@
     
     <div class="footer-info">
         <span>&copy; 2026 WIMOS Calc. All Rights Reserved.</span>
-        <span>Version 1.3</span>
+        <span>Version 1.0</span>
     </div>
 </div>
 
@@ -76,15 +80,32 @@ function reverseCalculateOffset() {
     const currentHeaveInt = Math.round(currentHeave * 10);
     const currentOffsetInt = Math.round(currentOffset * 10);
     
+    // 基準となる新オフセット計算
     const newOffsetInt = currentOffsetInt + (targetHeaveInt - currentHeaveInt);
     const newOffset = newOffsetInt / 10;
     
-    const minus3 = (newOffsetInt - 3) / 10;
-    const plus3 = (newOffsetInt + 3) / 10;
+    // 画面表示（中心値）
+    document.getElementById('newOffset').innerText = `隆起量 ${targetHeave.toFixed(1)}mm にする時: ${newOffset.toFixed(1)} mm`;
     
-    document.getElementById('newOffset').innerText = newOffset.toFixed(1) + " mm";
-    document.getElementById('offsetMinus3').innerText = "-0.3mm にする場合: " + minus3.toFixed(1) + " mm";
-    document.getElementById('offsetPlus3').innerText = "+0.3mm にする場合: " + plus3.toFixed(1) + " mm";
+    // 前後±0.3mm幅の相対表記を動的に生成
+    const offsets = [];
+    for (let i = -3; i <= 3; i++) {
+        if (i === 0) continue;
+        const targetVal = (targetHeaveInt + i) / 10;
+        const offsetVal = (newOffsetInt + i) / 10;
+        offsets.push({
+            step: i,
+            text: `隆起量 ${targetVal.toFixed(1)}mm にする時: ${offsetVal.toFixed(1)} mm`
+        });
+    }
+    
+    // 各行への割り当て
+    document.getElementById('offsetMinus3').innerText = offsets[0].text;
+    document.getElementById('offsetMinus2').innerText = offsets[1].text;
+    document.getElementById('offsetMinus1').innerText = offsets[2].text;
+    document.getElementById('offsetPlus1').innerText = offsets[3].text;
+    document.getElementById('offsetPlus2').innerText = offsets[4].text;
+    document.getElementById('offsetPlus3').innerText = offsets[5].text;
 }
 
 function resetForm() {
@@ -92,8 +113,12 @@ function resetForm() {
     document.getElementById('currentHeave').value = "0.0";
     document.getElementById('currentOffset').value = "0.0";
     document.getElementById('newOffset').innerText = "0.0 mm";
-    document.getElementById('offsetMinus3').innerText = "-0.3mm にする場合: -- mm";
-    document.getElementById('offsetPlus3').innerText = "+0.3mm にする場合: -- mm";
+    document.getElementById('offsetMinus3').innerText = "--";
+    document.getElementById('offsetMinus2').innerText = "--";
+    document.getElementById('offsetMinus1').innerText = "--";
+    document.getElementById('offsetPlus1').innerText = "--";
+    document.getElementById('offsetPlus2').innerText = "--";
+    document.getElementById('offsetPlus3').innerText = "--";
 }
 </script>
 
