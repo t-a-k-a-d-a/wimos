@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ワイモス オフセット逆算機 V1.1</title>
+    <title>ワイモス オフセット逆算機 V1.2</title>
     <style>
         body { font-family: sans-serif; margin: 15px; background: #f0f2f5; user-select: none; }
         .calc-box { max-width: 400px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h3 { margin-top: 0; color: #333; text-align: center; font-size: 18px; margin-bottom: 10px; }
         .footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
         
-        /* 入力フォームエリア */
         .form-group { margin-bottom: 8px; padding: 6px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; }
         .form-group.active { border-color: #007bff; background: #f0f7ff; }
         label { display: block; margin-bottom: 2px; font-weight: bold; font-size: 12px; color: #555; }
         .input-display { width: 100%; padding: 6px; box-sizing: border-box; background: white; border: 1px solid #ccc; border-radius: 4px; font-size: 18px; font-family: monospace; font-weight: bold; min-height: 34px; line-height: 22px; cursor: pointer; }
         .input-display.placeholder { color: #aaa; font-weight: normal; }
 
-        /* キーパッドエリア */
         .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; background: #e2e8f0; padding: 8px; border-radius: 6px; }
         .key { padding: 12px 0; background: white; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); -webkit-tap-highlight-color: transparent; }
         .key:active { background: #cbd5e1; }
@@ -26,7 +24,6 @@
         .key.calc { background: #28a745; color: white; grid-column: span 2; }
         .key.calc:active { background: #218838; }
 
-        /* 結果エリア */
         .result-box { margin-top: 12px; padding: 12px; background: #e9ecef; border-radius: 4px; border-left: 5px solid #28a745; }
         .result-sub { font-size: 13px; color: #555; margin: 4px 0; font-family: monospace; }
         .result-val { font-size: 20px; font-weight: bold; color: #dc3545; margin: 6px 0; font-family: monospace; }
@@ -36,7 +33,7 @@
 <body>
 
 <div class="calc-box">
-    <h3>ワイモス オフセット逆算機 <small style="font-size:13px; color:#666;">V1.1</small></h3>
+    <h3>ワイモス オフセット逆算機 <small style="font-size:13px; color:#666;">V1.2</small></h3>
     
     <div class="form-group active" id="group-targetHeave" onclick="selectInput('targetHeave')">
         <label>① 狙いたい隆起量 (mm)</label>
@@ -53,7 +50,6 @@
         <div id="currentOffset" class="input-display placeholder">0.0</div>
     </div>
     
-    <!-- 画面内キーパッド -->
     <div class="keypad">
         <button class="key" onclick="pressKey('7')">7</button>
         <button class="key" onclick="pressKey('8')">8</button>
@@ -87,17 +83,16 @@
     </div>
 
     <div class="note">
-        ※新しいオフセット ＝ 現在のオフセット ＋ (狙いたい隆起量 － 現在の表示隆起量)
+        ※新しいオフセット ＝ 現在のオフセット － (狙いたい隆起量 － 現在の表示隆起量)
     </div>
     
     <div class="footer-info">
         <span>&copy; 2026 WIMOS Calc. All Rights Reserved.</span>
-        <span>Version 1.1</span>
+        <span>Version 1.2</span>
     </div>
 </div>
 
 <script>
-// 入力状態の管理
 let activeInputId = 'targetHeave';
 let inputs = {
     targetHeave: { val: '', isCleared: false },
@@ -105,19 +100,16 @@ let inputs = {
     currentOffset: { val: '', isCleared: false }
 };
 
-// 入力欄の選択切り替え
 function selectInput(id) {
     activeInputId = id;
     document.querySelectorAll('.form-group').forEach(el => el.classList.remove('active'));
     document.getElementById('group-' + id).classList.add('active');
 }
 
-// キーパッドが押された時の処理
 function pressKey(key) {
     let current = inputs[activeInputId];
     let displayEl = document.getElementById(activeInputId);
 
-    // 最初の一歩、または初期値状態から数字を打つときは値をクリアして上書き開始
     if (!current.isCleared) {
         current.val = '';
         current.isCleared = true;
@@ -165,17 +157,10 @@ function pressKey(key) {
         return;
     }
 
-    // 小数点第2位以下の入力を防止するガード
-    if (current.val.includes('.')) {
-        let parts = current.val.split('.');
-        if (parts[1] && parts[1].length >= 1) return; 
-    }
-
     current.val += key;
     displayEl.innerText = current.val;
 }
 
-// 逆算処理
 function reverseCalculateOffset() {
     const targetHeave = parseFloat(inputs.targetHeave.val) || 0;
     const currentHeave = parseFloat(inputs.currentHeave.val) || 0;
@@ -185,7 +170,8 @@ function reverseCalculateOffset() {
     const currentHeaveInt = Math.round(currentHeave * 10);
     const currentOffsetInt = Math.round(currentOffset * 10);
     
-    const newOffsetInt = currentOffsetInt + (targetHeaveInt - currentHeaveInt);
+    // ワイモスのマニュアル仕様に合わせた逆算式 (オフセットをマイナス方向に補正)
+    const newOffsetInt = currentOffsetInt - (targetHeaveInt - currentHeaveInt);
     const newOffset = newOffsetInt / 10;
     
     document.getElementById('newOffset').innerText = `隆起量 ${targetHeave.toFixed(1)}mm にする時: ${newOffset.toFixed(1)} mm`;
@@ -195,8 +181,9 @@ function reverseCalculateOffset() {
     
     for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
+        // 隆起量が変動した時、新しいオフセットがどう連動すべきか算出
         const targetVal = (targetHeaveInt + step) / 10;
-        const offsetVal = (newOffsetInt + step) / 10;
+        const offsetVal = (newOffsetInt - step) / 10;
         const sign = step > 0 ? '+' : '';
         document.getElementById(ids[i]).innerText = `隆起量 ${targetVal.toFixed(1)}mm (${sign}${ (step/10).toFixed(1) }mm) の時: ${offsetVal.toFixed(1)} mm`;
     }
