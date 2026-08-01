@@ -2,10 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <!-- maximum-scale=1.0 と user-scalable=no でダブルタップ拡大を安全に禁止 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ワイモス オフセット逆算機 V1.1</title>
+    <title>ワイモス オフセット逆算機 V1.2</title>
     <style>
-        body { font-family: sans-serif; margin: 15px; background: #f0f2f5; user-select: none; touch-action: manipulation; }
+        /* user-select: none を削除し、タップ操作の不具合を完全に解消 */
+        body { font-family: sans-serif; margin: 15px; background: #f0f2f5; }
         .calc-box { max-width: 400px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h3 { margin-top: 0; color: #333; text-align: center; font-size: 18px; margin-bottom: 10px; }
         .footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
@@ -19,12 +21,12 @@
 
         /* キーパッドエリア */
         .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; background: #e2e8f0; padding: 8px; border-radius: 6px; }
-        .key { padding: 12px 0; background: white; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .key { padding: 12px 0; background: white; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); -webkit-tap-highlight-color: transparent; }
         .key:active { background: #cbd5e1; }
         .key.action { background: #6c757d; color: white; }
         .key.action:active { background: #495057; }
 
-        /* コントロールボタン（テンキーの下に配置） */
+        /* コントロールボタン */
         .control-row { display: flex; gap: 8px; margin-top: 10px; }
         .btn-calc { flex: 2; padding: 14px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .btn-calc:active { background: #218838; }
@@ -41,7 +43,7 @@
 <body>
 
 <div class="calc-box">
-    <h3>ワイモス オフセット逆算機 <small style="font-size:13px; color:#666;">V1.1</small></h3>
+    <h3>ワイモス オフセット逆算機 <small style="font-size:13px; color:#666;">V1.2</small></h3>
     
     <div class="form-group active" id="group-targetHeave" onclick="selectInput('targetHeave')">
         <label>① 狙いたい隆起量 (mm)</label>
@@ -79,13 +81,13 @@
         <button class="key" onclick="pressKey('.')">.</button>
     </div>
 
-    <!-- アクションボタン行（テンキーの下に配置変更） -->
+    <!-- アクションボタン行（テンキーの下） -->
     <div class="control-row">
         <button class="btn-calc" onclick="reverseCalculateOffset()">計算する</button>
         <button class="btn-all-reset" onclick="pressKey('ALL_RESET')">一括リセット</button>
     </div>
     
-    <!-- 結果エリア -->
+    <!-- 結果エリア（高い順が上） -->
     <div class="result-box" id="resultArea">
         <div>設定すべき新しいオフセット値:</div>
         <div class="result-sub" id="offsetPlus3">--</div>
@@ -103,7 +105,7 @@
     
     <div class="footer-info">
         <span>&copy; 2026 WIMOS Calc. All Rights Reserved.</span>
-        <span>Version 1.1</span>
+        <span>Version 1.2</span>
     </div>
 </div>
 
