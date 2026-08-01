@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワイモス オフセット逆算機</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background: #f0f2f5; }
+        .calc-box { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        .btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn:hover { background: #218838; }
+        .result-box { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; border-left: 5px solid #28a745; }
+        .result-val { font-size: 24px; font-weight: bold; color: #dc3545; margin-top: 5px; }
+        .note { font-size: 12px; color: #666; margin-top: 15px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="calc-box">
+    <h3>ワイモス オフセット逆算機</h3>
+    
+    <div class="form-group">
+        <label>① 戻したい値（隆起量） (mm)</label>
+        <input type="number" id="targetHeave" step="0.1" value="0.0" placeholder="前回の値を入力">
+    </div>
+
+    <div class="form-group">
+        <label>② 現在のワイモス表示隆起量 (mm)</label>
+        <input type="number" id="currentHeave" step="0.1" value="0.0" placeholder="レーザー移動後の現在の値">
+    </div>
+    
+    <div class="form-group">
+        <label>③ 現在のオフセット設定値 (mm)</label>
+        <input type="number" id="currentOffset" step="0.1" value="0.0" placeholder="現在の設定値（なければ0）">
+    </div>
+    
+    <button class="btn" onclick="reverseCalculateOffset()">設定すべきオフセットを計算</button>
+    
+    <div class="result-box">
+        <div>設定すべき新しいオフセット値:</div>
+        <div class="result-val" id="newOffset">0.0 mm</div>
+    </div>
+
+    <div class="note">
+        ※計算ロジック：<br>
+        新しいオフセット ＝ 現在のオフセット ＋ (狙いたい隆起量 － 現在の表示隆起量)
+    </div>
+</div>
+
+<script>
+function reverseCalculateOffset() {
+    // 入力値の取得（空欄は0として処理）
+    const targetHeave = parseFloat(document.getElementById('targetHeave').value) || 0;
+    const currentHeave = parseFloat(document.getElementById('currentHeave').value) || 0;
+    const currentOffset = parseFloat(document.getElementById('currentOffset').value) || 0;
+    
+    // 計算処理（丸め誤差対策のため10倍して計算）
+    const targetHeaveInt = Math.round(targetHeave * 10);
+    const currentHeaveInt = Math.round(currentHeave * 10);
+    const currentOffsetInt = Math.round(currentOffset * 10);
+    
+    // 逆算式：新しいオフセット = 現在のオフセット + (狙いたい値 - 現在の値)
+    const newOffsetInt = currentOffsetInt + (targetHeaveInt - currentHeaveInt);
+    const newOffset = newOffsetInt / 10;
+    
+    // 画面表示（小数点第1位固定）
+    document.getElementById('newOffset').innerText = newOffset.toFixed(1) + " mm";
+}
+</script>
+
+</body>
+</html>
