@@ -2,102 +2,42 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ワイモス オフセット逆算機 V1.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ワイモス オフセット逆算機 V1.1</title>
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: sans-serif; 
-            margin: 0; 
-            padding: 10px; 
-            background: #f0f2f5; 
-        }
-        
-        .calc-box { 
-            width: 100%; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-        }
-        
-        h3 { margin-top: 0; color: #333; text-align: center; font-size: 18px; margin-bottom: 12px; }
+        body { font-family: sans-serif; margin: 15px; background: #f0f2f5; }
+        .calc-box { max-width: 400px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; text-align: center; font-size: 18px; margin-bottom: 10px; }
         .footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
         
-        /* 入力フォームエリア */
         .form-group { margin-bottom: 8px; padding: 6px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; }
         .form-group.active { border-color: #007bff; background: #f0f7ff; }
         label { display: block; margin-bottom: 2px; font-weight: bold; font-size: 12px; color: #555; }
-        .input-display { width: 100%; padding: 8px; box-sizing: border-box; background: white; border: 1px solid #ccc; border-radius: 4px; font-size: 20px; font-family: monospace; font-weight: bold; min-height: 40px; line-height: 24px; cursor: pointer; }
+        .input-display { width: 100%; padding: 6px; box-sizing: border-box; background: white; border: 1px solid #ccc; border-radius: 4px; font-size: 18px; font-family: monospace; font-weight: bold; min-height: 34px; line-height: 22px; cursor: pointer; }
         .input-display.placeholder { color: #aaa; font-weight: normal; }
 
-        /* キーパッドエリア */
         .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; background: #e2e8f0; padding: 8px; border-radius: 6px; }
-        
-        .key { 
-            padding: 14px 0; 
-            background: white; 
-            border: none; 
-            border-radius: 4px; 
-            font-size: 20px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-align: center; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: manipulation; 
-        }
+        .key { padding: 12px 0; background: white; border: none; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); -webkit-tap-highlight-color: transparent; }
         .key:active { background: #cbd5e1; }
         .key.action { background: #6c757d; color: white; }
         .key.action:active { background: #495057; }
 
-        /* コントロールボタン */
         .control-row { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-calc { 
-            flex: 2; 
-            padding: 14px; 
-            background: #28a745; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            text-align: center; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: manipulation; 
-        }
+        .btn-calc { flex: 2; padding: 14px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .btn-calc:active { background: #218838; }
-        .btn-all-reset { 
-            flex: 1; 
-            padding: 14px; 
-            background: #dc3545; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            text-align: center; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: manipulation; 
-        }
+        .btn-all-reset { flex: 1; padding: 14px; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .btn-all-reset:active { background: #bd2130; }
 
-        /* 結果エリア */
         .result-box { margin-top: 12px; padding: 12px; background: #e9ecef; border-radius: 4px; border-left: 5px solid #28a745; scroll-margin-top: 10px; }
-        .result-sub { font-size: 13px; color: #555; margin: 5px 0; font-family: monospace; }
-        .result-val { font-size: 20px; font-weight: bold; color: #dc3545; margin: 8px 0; font-family: monospace; }
+        .result-sub { font-size: 13px; color: #555; margin: 4px 0; font-family: monospace; }
+        .result-val { font-size: 20px; font-weight: bold; color: #dc3545; margin: 6px 0; font-family: monospace; }
         .note { font-size: 11px; color: #666; margin-top: 10px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="calc-box">
-    <h3>ワイモス オフセット逆算機 <small style="font-size:14px; color:#666;">V1.2</small></h3>
+    <h3>ワイモス オフセット逆算機 <small style="font-size:13px; color:#666;">V1.1</small></h3>
     
     <div class="form-group active" id="group-targetHeave" onclick="selectInput('targetHeave')">
         <label>① 狙いたい隆起量 (mm)</label>
@@ -156,7 +96,7 @@
     
     <div class="footer-info">
         <span>&copy; 2026 WIMOS Calc. All Rights Reserved.</span>
-        <span>Version 1.2</span>
+        <span>Version 1.1</span>
     </div>
 </div>
 
@@ -257,4 +197,25 @@ function reverseCalculateOffset() {
     const currentOffsetInt = Math.round(currentOffset * 10);
     
     const newOffsetInt = currentOffsetInt - (targetHeaveInt - currentHeaveInt);
-    const newOffset = newOffsetInt / 10;document.getElementById('newOffset').innerText = 隆起量 ${targetHeave.toFixed(1)}mm にする時: ${newOffset.toFixed(1)} mm;const ids = ['offsetPlus3', 'offsetPlus2', 'offsetPlus1', 'offsetMinus1', 'offsetMinus2', 'offsetMinus3'];const steps = [3, 2, 1, -1, -2, -3];for (let i = 0; i < steps.length; i++) {const step = steps[i];const targetVal = (targetHeaveInt + step) / 10;const offsetVal = (newOffsetInt - step) / 10;const sign = step > 0 ? '+' : '';document.getElementById(ids[i]).innerText = 隆起量 ${targetVal.toFixed(1)}mm (${sign}${ (step/10).toFixed(1) }mm) の時: ${offsetVal.toFixed(1)} mm;}
+    const newOffset = newOffsetInt / 10;
+    
+    document.getElementById('newOffset').innerText = `隆起量 ${targetHeave.toFixed(1)}mm にする時: ${newOffset.toFixed(1)} mm`;
+    
+    // 表示IDと計算ステップを正しく対応（高い順が上）
+    const ids = ['offsetPlus3', 'offsetPlus2', 'offsetPlus1', 'offsetMinus1', 'offsetMinus2', 'offsetMinus3'];
+    const steps = [3, 2, 1, -1, -2, -3];
+    
+    for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        const targetVal = (targetHeaveInt + step) / 10;
+        const offsetVal = (newOffsetInt - step) / 10;
+        const sign = step > 0 ? '+' : '';
+        document.getElementById(ids[i]).innerText = `隆起量 ${targetVal.toFixed(1)}mm (${sign}${ (step/10).toFixed(1) }mm) の時: ${offsetVal.toFixed(1)} mm`;
+    }
+
+    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
